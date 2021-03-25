@@ -1,35 +1,43 @@
 import spotipy
 import spotipy.util as util
 from tqdm import tqdm
+from spotipy.oauth2 import SpotifyClientCredentials
 
-SPOTIFY_USERNAME = "EDIT THIS"
+#This is anisoptera.radio (utility account)
+#SPOTIFY_USERNAME = "pex2sltc89rc210m4vehijvek"
 
-if (SPOTIFY_USERNAME == "EDIT THIS"):
-    print(
-        "you need to change EDIT THIS in musicInCommon.py line 5 to your own spotify username"
-    )
-    exit()
+#SPOTIFY_SCOPE = "playlist-modify-private playlist-modify-public"
 
-SPOTIFY_SCOPE = "playlist-modify-private playlist-modify-public"
+#token = util.prompt_for_user_token(SPOTIFY_USERNAME, SPOTIFY_SCOPE)
+#sp = spotipy.Spotify(token)
 
-token = util.prompt_for_user_token(SPOTIFY_USERNAME, SPOTIFY_SCOPE)
-sp = spotipy.Spotify(token)
+
+def initClientCredentials():
+    global sp
+    client_credentials_manager = SpotifyClientCredentials()
+    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
 def main():
+    initClientCredentials()
     users = usersFromFile("users.txt")
+    tracks = getPlaylistTracks(users)
+    print(tracks)
+    #makePlaylistWithTracks(tracks, "overlap of " + ", ".join(users))
+
+
+def getPlaylistTracks(users):
     allTracks = [tracksFromUserPlaylists(user) for user in tqdm(users)]
     overlap = findOverlap(allTracks,
                           (2 if len(users) == 2 else len(users) / 2))
+    return overlap
 
-    newPl = sp.user_playlist_create(SPOTIFY_USERNAME,
-                                    "overlap of " + ", ".join(users))['uri']
 
-    print(overlap)
+def makePlaylistWithTracks(tracks, name):
+    newPl = sp.user_playlist_create(SPOTIFY_USERNAME, name)['uri']
 
-    for i in tqdm(range(0, len(overlap), 100)):
-        sp.user_playlist_add_tracks(SPOTIFY_USERNAME, newPl,
-                                    overlap[i:i + 100])
+    for i in tqdm(range(0, len(tracks), 100)):
+        sp.user_playlist_add_tracks(SPOTIFY_USERNAME, newPl, tracks[i:i + 100])
 
 
 def findOverlap(allTracks, cutoff):
