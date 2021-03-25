@@ -96,5 +96,15 @@ def tracksInPlaylist(user, playlist):
     return tracks
 
 
+def formatTracklist(tracks):
+    formatted = []
+    for track in tracks:
+        tDat = sp.track(track)
+        formatted.append(tDat['name'] + " - " + tDat['artists'][0]['name'])
+
+    formatted = sorted(formatted, key=lambda x: x[::-1])
+    return "\n\n<br>".join(formatted)
+
+
 if __name__ == "__main__":
     main()
