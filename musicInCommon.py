@@ -25,13 +25,22 @@ def main():
     sp = spotipy.Spotify(token)
 
     #makePlaylistWithTracks(tracks, "overlap of " + ", ".join(users))
+    makePlaylistWithTracks(tracks, "overlap playlist")
 
 
 def getPlaylistTracks(users):
     allTracks = [tracksFromUserPlaylists(user) for user in tqdm(users)]
-    overlap = findOverlap(allTracks,
-                          (2 if len(users) == 2 else len(users) / 2))
-    return overlap
+    if len(users) == 2:
+        return findOverlap(allTracks, 2)
+
+    else:
+        overlaps = [
+            findOverlap(allTracks, n) for n in tqdm(range((len(users))))
+        ]
+        for n in range(len(users)):
+            print("{}: {}".format(n, len(overlaps[n])))
+        chosen = int(input("choose n\n> "))
+        return overlaps[chosen]
 
 
 def makePlaylistWithTracks(tracks, name):
