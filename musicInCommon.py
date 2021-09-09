@@ -3,14 +3,6 @@ import spotipy.util as util
 from tqdm import tqdm
 from spotipy.oauth2 import SpotifyClientCredentials
 
-#This is anisoptera.radio (utility account)
-#SPOTIFY_USERNAME = "pex2sltc89rc210m4vehijvek"
-
-#SPOTIFY_SCOPE = "playlist-modify-private playlist-modify-public"
-
-#token = util.prompt_for_user_token(SPOTIFY_USERNAME, SPOTIFY_SCOPE)
-#sp = spotipy.Spotify(token)
-
 
 def initClientCredentials():
     global sp
@@ -20,9 +12,18 @@ def initClientCredentials():
 
 def main():
     initClientCredentials()
+
+    SPOTIFY_SCOPE = "playlist-modify-private playlist-modify-public"
+    global SPOTIFY_USERNAME
+    SPOTIFY_USERNAME = input("enter your spotify username\n> ")
+    token = util.prompt_for_user_token(SPOTIFY_USERNAME, SPOTIFY_SCOPE)
+
     users = usersFromFile("users.txt")
     tracks = getPlaylistTracks(users)
     print(tracks)
+    global sp
+    sp = spotipy.Spotify(token)
+
     #makePlaylistWithTracks(tracks, "overlap of " + ", ".join(users))
 
 
